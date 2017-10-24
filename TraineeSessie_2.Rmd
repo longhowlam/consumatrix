@@ -61,14 +61,12 @@ class(out)
 
 Met verschillende functies kan je nu een xml_document parsen, bestudeer de site met chrome om een idee te krijgen van de elementen en structuur. Met behulp van XPath (XML Path-taal of XML Path Language), een querytaal voor het adresseren van onderdelen van XML-documenten, kan je verschillende elementen uit een xml_document krijgen.
 
-Een kort overzicht vind je [hier](https://msdn.microsoft.com/en-us/library/ms256086(v=vs.110).aspx).
-
-
+Een kort overzicht vind je <a href="https://msdn.microsoft.com/en-us/library/ms256086(v=vs.110).aspx"> hier </a>. Gebruik dubbel slash `//` om alle elementen in een document te vinden, bijvoorbeeld `//h2` om alle h2 elementen in een docuemnt te pakken.
 
 
 ![](rvest01.png)
 
-Neem als voorbeeld de straat van het huis, rechts klik op de straat en klik inspect element, het is een `h2` object met een `class` property. Deze kan je met xpath als volgt opgeven.
+Neem als voorbeeld de straat van het huis, rechts klik op de straat en klik inspect element, het is een `h2` object met een bepaalde `class` property. Deze kan je dan met Xpath als volgt opgeven:
 
 ```{r, eval=FALSE}
 ## pak als voorbeeld de straat
@@ -123,9 +121,7 @@ class(tmp)
 tmp[[1]]$fields$clickOrEnter$name
 ```
 
-Zie ook de Environment browser waar je het object `tmp` kan browsen.
-
-Soms bevat een html pagina een tabel, deze kan je makkelijk vertalen naarr een R data set met `html_table`.
+Zie ook de Environment browser waar je het object `tmp` kan browsen. Soms bevat een html pagina een tabel, deze kan je makkelijk vertalen naar een R data set met `html_table`.
 
 ```{r, eval = FALSE}
 ## op deze pagina staan interessante geboorte statistiken
