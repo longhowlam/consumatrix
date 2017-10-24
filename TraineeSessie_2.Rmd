@@ -188,6 +188,7 @@ for(j in 1:10){
   
   for(i in 1:length(artikels))
   {
+    print(i)
     out2 = read_html(artikels[i])
     art = html_nodes(out2, xpath = '//div[@class="article_textwrap"]') %>% html_text %>% paste(collapse = " ")
     titel = html_nodes(out2, xpath = '//h1[@class="article__title"]') %>% html_text()
@@ -196,6 +197,7 @@ for(j in 1:10){
     tmp = data.frame(datum, titel, art, link = artikels[i], categorie)
     OUT = rbind(OUT,tmp)
   }
+  OUT = OUT %>% distinct()
   print(j)
   print(datum)
   saveRDS(OUT, "nosnieuws.RDs")
