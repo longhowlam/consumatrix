@@ -37,6 +37,7 @@ library(mlr)
 library(h2o)
 library(dplyr)
 
+library(purrr)
 library(stringr)
 library(ggplot2)
 ```
@@ -61,7 +62,7 @@ class(out)
 
 Met verschillende functies kan je nu een xml_document parsen, bestudeer de site met chrome om een idee te krijgen van de elementen en structuur. Met behulp van XPath (XML Path-taal of XML Path Language), een querytaal voor het adresseren van onderdelen van XML-documenten, kan je verschillende elementen uit een xml_document krijgen.
 
-Een kort overzicht vind je <a href="https://msdn.microsoft.com/en-us/library/ms256086(v=vs.110).aspx"> hier </a>. Gebruik dubbel slash `//` om alle elementen in een document te vinden, bijvoorbeeld `//h2` om alle h2 elementen in een docuemnt te pakken.
+Een kort overzicht vind je <a href="https://msdn.microsoft.com/en-us/library/ms256086(v=vs.110).aspx"> hier </a>. Gebruik dubbel slash `//` om alle elementen in een document te vinden, bijvoorbeeld `//h2` om alle h2 elementen in een docuemnt te pakken. Gebruik `@` om attributen te selecteren.
 
 
 ![](rvest01.png)
@@ -90,8 +91,11 @@ price =  html_nodes(out, xpath='//div[@class="property-price"]') %>% html_text()
 
 ## De prijs is zichtbaar maar het is niet handig om te gebruiken
 price
+```
 
-## gebruiken wat regexpr om prijzen er uit te halen
+Gebruik reguliere expressies om de prijs er uit te pulleken en als bruikbaar numeriek veld te hebben.
+
+```{r, eval=FALSE}
 prijs = str_extract(
   price,
   "[:digit:]+[\\.][:digit:]+[\\.]*[:digit:]*"
@@ -103,6 +107,7 @@ str_replace_all("\\." , "") %>%
 In de huizen data staan ook per huis een link, deze kan je er ook uit halen.
 
 ![](rvest02.png)
+
 Het is een `a` tag met `class`="property-inner" waarvan je de href moet hebben, dat kan je als volgt met xpath opgeven.
 
 ```{r, eval = FALSE}
@@ -110,7 +115,8 @@ linkhuis =  html_nodes(out, xpath='//a[@class="property-inner"]/@href') %>% html
 linkhuis
 ```
 
-In een for loop kan je deze weer scrapen.
+In een `for` loop zou je al deze links weer kunnen scrapen.
+
 
 ## Verder voorbeelden
 
@@ -137,6 +143,65 @@ out[[2]] %>% html_table()
 
 Een compleet script om jaap.nl te scapen zie je [hier](https://github.com/longhowlam/jaap). Switch naar jaap project.
 
+## NOS nieuws site scrapen
+
+Nog een voorbeeld om nieuws archief berichten van de NOS site te scrapen. De archieven zijn per dag georganiseerd. Zie bijvoorbeeld de links:
+
+https://nos.nl/nieuws/archief/2017-10-23/
+https://nos.nl/nieuws/archief/2017-10-22/
+https://nos.nl/nieuws/archief/2017-10-21/
+https://nos.nl/nieuws/archief/2016-10-23/
+
+
+Laten we als voorbeeld de laatste 10 dagen pakken
+
+```{r}
+OUT = data.frame()
+
+## we kunnen handmatig 1 iteratie uitvoeren om te zien of het werkt
+j=1
+
+for(j in 1:10){
+  
+  ### Maak de juiste URL aan
+  datum = as.character(Sys.Date() - j)
+  nieuwslinks = paste0("https://nos.nl/nieuws/archief/", datum)
+  
+  ### Lees de link in
+  out = read_html(nieuwslinks)
+
+  ### dit is een nodeset met artikelen, maar daar moeten we de links uit pulleken
+  artikels = html_nodes(
+    out, 
+    xpath = "//a[contains(@href, 'artikel')]"
+  )
+  
+  ## maak een lijst van attributen waarbij je alleen de href genaamde list objecten pakt
+  lijst = artikels %>%   html_attrs()
+  
+  ## gebruik uit purrr map_chr, waarbij je een lijst langs kan gaan en alleen bepaalde elementen kan pakken
+  artikels = lijst %>%  map_chr("href") %>%  unique()
+  
+  artikels = paste0("https://nos.nl", artikels)
+
+  ### loop nu langs alle artiekelen links 
+  
+  for(i in 1:length(artikels))
+  {
+    out2 = read_html(artikels[i])
+    art = html_nodes(out2, xpath = '//div[@class="article_textwrap"]') %>% html_text %>% paste(collapse = " ")
+    titel = html_nodes(out2, xpath = '//h1[@class="article__title"]') %>% html_text()
+    datum = html_nodes(out2, xpath = '//time') %>% html_attrs() %>% .[[1]]
+    categorie = html_nodes(out2, xpath='//a[@class="link-grey"]') %>% html_text
+    tmp = data.frame(datum, titel, art, link = artikels[i], categorie)
+    OUT = rbind(OUT,tmp)
+  }
+  print(j)
+  print(datum)
+  saveRDS(OUT, "nosnieuws.RDs")
+  Sys.sleep(2*runif(1))
+}
+```
 
 
 # Predictive modeling technieken
@@ -197,7 +262,7 @@ f3 <- prijs ~ Oppervlakte*kamers*PC1Positie - Oppervlakte:kamers:PC1Positie +en_
 m3 = lm(f3, data = jaap)
 summary(m3)
 
-## bijzonderheden
+## bijzonderheden, er is weinig significant....
 f4 = prijs ~  en_energielabel + en_energieverbruik + en_verwarming
 m4 = lm(f4, data = jaap)
 summary(m4)
@@ -208,7 +273,7 @@ Als je verschillende model objecten hebt gemaakt kan je de functie `anova` gebru
 
 
 ```{r, eval =FALSE}
-anova(m1,m2, m3)
+anova(m1, m2, m3)
 ```
 
 
