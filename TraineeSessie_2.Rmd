@@ -60,7 +60,7 @@ out = read_html(baseurl)
 class(out)
 ```
 
-Met verschillende functies kan je nu een xml_document parsen, bestudeer de site met chrome om een idee te krijgen van de elementen en structuur. Met behulp van XPath (XML Path-taal of XML Path Language), een querytaal voor het adresseren van onderdelen van XML-documenten, kan je verschillende elementen uit een xml_document krijgen.
+Met verschillende functies kan je nu een xml_document parsen, bestudeer de site met chrome om een idee te krijgen van de elementen en structuur. Met behulp van CSS of  XPath (XML Path-taal of XML Path Language), een querytaal voor het adresseren van onderdelen van XML-documenten, kan je verschillende elementen uit een xml_document krijgen.
 
 Een kort overzicht vind je <a href="https://msdn.microsoft.com/en-us/library/ms256086(v=vs.110).aspx"> hier </a>. Gebruik dubbel slash `//` om alle elementen in een document te vinden, bijvoorbeeld `//h2` om alle h2 elementen in een docuemnt te pakken. Gebruik `@` om attributen te selecteren.
 
@@ -145,17 +145,17 @@ Een compleet script om jaap.nl te scapen zie je [hier](https://github.com/longho
 
 ## NOS nieuws site scrapen
 
-Nog een voorbeeld om nieuws archief berichten van de NOS site te scrapen. De archieven zijn per dag georganiseerd. Zie bijvoorbeeld de links:
+Nog een voorbeeld, nieuws archief berichten van de NOS site scrapen. De archieven zijn per dag georganiseerd. Zie bijvoorbeeld de links:
 
-https://nos.nl/nieuws/archief/2017-10-23/
-https://nos.nl/nieuws/archief/2017-10-22/
-https://nos.nl/nieuws/archief/2017-10-21/
-https://nos.nl/nieuws/archief/2016-10-23/
-
+* https://nos.nl/nieuws/archief/2017-10-23/
+* https://nos.nl/nieuws/archief/2017-10-22/
+* https://nos.nl/nieuws/archief/2017-10-21/
+* https://nos.nl/nieuws/archief/2016-10-23/
+* etc.
 
 Laten we als voorbeeld de laatste 10 dagen pakken
 
-```{r}
+```{r, eval=FALSE}
 OUT = data.frame()
 
 ## we kunnen handmatig 1 iteratie uitvoeren om te zien of het werkt
@@ -205,6 +205,47 @@ for(j in 1:10){
 }
 ```
 
+## SelectorGadget in chrome
+
+Met de selector gadget plugin (in Chrome) kan je elementen selecteren op een web pagina, je krijgt dan de CSS te zien en kan deze gebruiken in de functie `html_nodes`. Een aantal voorbeelden:
+
+```{r, eval=FALSE}
+### HEMA producten
+hema = "https://www.hema.nl/winkel/baby/babyspeelgoed"
+out = read_html(hema)
+speelgoed = html_nodes(out, "h4") %>% html_text()
+html_nodes(out, ".price") %>% html_text()
+
+### Media Markt laptops
+MM = "http://www.mediamarkt.nl/nl/category/_laptops-482723.html?searchParams=&sort=&view=PRODUCTLIST&page=3"
+out = read_html(MM)
+price = html_nodes(out, ".product-wrapper") %>%
+  html_nodes(".price-box") %>%
+  html_text() %>%
+  str_replace_all("\r","") %>%
+  str_replace_all("\t","") %>%
+  str_replace_all("\n","")
+
+merk = html_nodes(out, ".product-wrapper") %>%
+  html_nodes("h2") %>%
+  html_text() %>%
+  str_replace_all("\r","") %>%
+  str_replace_all("\t","") %>%
+  str_replace_all("\n","")
+
+
+cleanstring <- function(x){
+  str_replace_all(x,"\r","") %>%
+  str_replace_all("\t","") %>%
+  str_replace_all("\n","")
+}
+
+merk = html_nodes(out, ".product-wrapper") %>%
+  html_nodes("h2") %>%
+  html_text() %>%
+  cleanstring()
+
+```
 
 # Predictive modeling technieken
 
