@@ -155,7 +155,7 @@ We beginnen met simpele lineaire regressie, bruikbaar voor voorspel modellen waa
 jaap = readRDS("data/Jaap.RDs")
 
 modelout  = lm( prijs ~ kamers              , data = jaap)
-modelout2 = lm( prijs ~kamers + Oppervlakte , data = jaap) 
+modelout2 = lm( prijs ~ kamers + Oppervlakte , data = jaap) 
 
 modelout
 modelout2
