@@ -152,7 +152,7 @@ Lineaire regressie met de functie `lm`, logistische regressie met de functie `gl
 We beginnen met simpele lineaire regressie, bruikbaar voor voorspel modellen waar de Target variable continu (numeric) is. We nemen als voorbeeld huizen prijs data die ik gescraped heb van jaap.nl. We willen de prijs van een huis voorspellen basis van een aantal input variabelen/kenmerken.
 
 ```{r, eval = FALSE}
-jaap = readRDS("data/Jaap.RDs")
+jaap = readRDS("data/jaapData.RDs")
 
 modelout  = lm( prijs ~ kamers              , data = jaap)
 modelout2 = lm( prijs ~ kamers + Oppervlakte , data = jaap) 
@@ -166,6 +166,7 @@ Modeling functies in R retourneren objecten met van alles er nog wat in. De func
 ```{r, eval = FALSE}
 class(modelout)
 names(modelout)
+
 modelout$coefficients
 
 summary(modelout)
@@ -178,7 +179,7 @@ Modellen in R kan je specificeren met zogenaamde de formula objects. Hieronder z
 
 ```{r, eval = FALSE}
 names(jaap)
-jaap = jaap %>% mutate(PC1Positie = stringr::str_sub(PC,1,1))
+jaap = jaap %>% mutate(PC1Positie = stringr::str_sub(PC6,1,1))
 f1 <- prijs ~ Oppervlakte + kamers + PC1Positie
 m1 = lm(f1, data = jaap)
 m1
@@ -192,12 +193,12 @@ summary(m2)
 
 
 ##  termen weglaten
-f3 <- prijs ~ Oppervlakte*kamers*PC1Positie - Oppervlakte:kamers:PC1Positie
+f3 <- prijs ~ Oppervlakte*kamers*PC1Positie - Oppervlakte:kamers:PC1Positie +en_Isolatie
 m3 = lm(f3, data = jaap)
 summary(m3)
 
-## een target en de rest van de variabelen als inputs
-f4 = prijs ~ . -PC6 -PC
+## bijzonderheden
+f4 = prijs ~  en_energielabel + en_energieverbruik + en_verwarming
 m4 = lm(f4, data = jaap)
 summary(m4)
 ```
