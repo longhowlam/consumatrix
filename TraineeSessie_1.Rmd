@@ -3,6 +3,10 @@ title: "Data prep & interactive data visualiatie"
 author: "Longhow Lam"
 subtitle: "Consumatrix Sessie 01"
 output:
+  pdf_document:
+    toc: true
+    toc_depth: 2
+    number_sections: true
   prettydoc::html_pretty:
     highlight: github
     number_sections: yes
