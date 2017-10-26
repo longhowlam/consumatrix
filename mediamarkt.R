@@ -3,6 +3,8 @@ library(purrr)
 library(stringr)
 library(ggplot2)
 
+### Linkedin update https://www.linkedin.com/feed/update/urn:li:activity:6328957185808232448/
+
 cleanstring <- function(x){
   str_replace_all(x,"\r","") %>%
     str_replace_all("\t","") %>%
