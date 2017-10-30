@@ -8,7 +8,8 @@ library(ggplot2)
 cleanstring <- function(x){
   str_replace_all(x,"\r","") %>%
     str_replace_all("\t","") %>%
-    str_replace_all("\n","")
+    str_replace_all("\n","") %>%
+    str_trim()
 }
 
 ### Scrape Media Markt laptops

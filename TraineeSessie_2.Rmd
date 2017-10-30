@@ -213,16 +213,25 @@ for(j in 1:10){
 
 Met de selector gadget plugin (in Chrome) kan je elementen selecteren op een web pagina, je krijgt dan de CSS te zien en kan deze gebruiken in de functie `html_nodes`. Een aantal voorbeelden:
 
+Hema 
+
 ```{r, eval=FALSE}
 ### HEMA producten
 hema = "https://www.hema.nl/winkel/baby/babyspeelgoed"
 out = read_html(hema)
 speelgoed = html_nodes(out, "h4") %>% html_text()
-html_nodes(out, ".price") %>% html_text()
+prijs = html_nodes(out, ".price") %>% html_text()
+```
 
-### Media Markt laptops
+Mediamarkt
+
+```{r, eval=FALSE}
+### Media Markt laptops, scrape 1 pagina....
+
 MM = "http://www.mediamarkt.nl/nl/category/_laptops-482723.html?searchParams=&sort=&view=PRODUCTLIST&page=3"
+
 out = read_html(MM)
+
 price = html_nodes(out, ".product-wrapper") %>%
   html_nodes(".price-box") %>%
   html_text() %>%
