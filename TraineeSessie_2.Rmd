@@ -29,6 +29,10 @@ output:
 
 ```{r, eval=FALSE, include=FALSE}
 library(rvest)
+library(purrr)
+library(stringr)
+library(ggplot2)
+
 library(rpart)
 library(glmnet)
 library(ranger)
@@ -41,9 +45,6 @@ library(mlr)
 library(h2o)
 library(dplyr)
 
-library(purrr)
-library(stringr)
-library(ggplot2)
 ```
 
 
@@ -259,6 +260,8 @@ merk = html_nodes(out, ".product-wrapper") %>%
   cleanstring()
 
 ```
+
+
 
 # Predictive modeling technieken
 
