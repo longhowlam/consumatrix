@@ -250,15 +250,17 @@ j=<span class="dv">1</span>
 <div id="selectorgadget-in-chrome" class="section level2">
 <h2><span class="header-section-number">1.5</span> SelectorGadget in chrome</h2>
 <p>Met de selector gadget plugin (in Chrome) kan je elementen selecteren op een web pagina, je krijgt dan de CSS te zien en kan deze gebruiken in de functie <code>html_nodes</code>. Een aantal voorbeelden:</p>
-<p>Hema</p>
+<div id="hema-voorbeeldje" class="section level3">
+<h3><span class="header-section-number">1.5.1</span> Hema voorbeeldje</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">### HEMA producten
 hema =<span class="st"> &quot;https://www.hema.nl/winkel/baby/babyspeelgoed&quot;</span>
 out =<span class="st"> </span><span class="kw">read_html</span>(hema)
 speelgoed =<span class="st"> </span><span class="kw">html_nodes</span>(out, <span class="st">&quot;h4&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">html_text</span>()
 prijs =<span class="st"> </span><span class="kw">html_nodes</span>(out, <span class="st">&quot;.price&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">html_text</span>()</code></pre></div>
-<p>Mediamarkt</p>
+</div>
+<div id="mediamarkt-voorbeeldje" class="section level3">
+<h3><span class="header-section-number">1.5.2</span> Mediamarkt voorbeeldje</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">### Media Markt laptops, scrape 1 pagina....
-
 MM =<span class="st"> &quot;http://www.mediamarkt.nl/nl/category/_laptops-482723.html?searchParams=&amp;sort=&amp;view=PRODUCTLIST&amp;page=3&quot;</span>
 
 out =<span class="st"> </span><span class="kw">read_html</span>(MM)
@@ -275,19 +277,29 @@ merk =<span class="st"> </span><span class="kw">html_nodes</span>(out, <span cla
 <span class="st">  </span><span class="kw">html_text</span>() <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;</span><span class="ch">\r</span><span class="st">&quot;</span>,<span class="st">&quot;&quot;</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">&quot;</span>,<span class="st">&quot;&quot;</span>) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>,<span class="st">&quot;&quot;</span>)
-
-
+<span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>,<span class="st">&quot;&quot;</span>)</code></pre></div>
+<p>De <code>str_replace_all</code> functie die steeds wordt gebruikt kan je ook weg stoppen in een functie. Ook de prijs kun je nog wat netter maken door naar nuneriek te transformeren.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## functie om wat tabs, newlines en returns weg te halen
 cleanstring &lt;-<span class="st"> </span><span class="cf">function</span>(x){
   <span class="kw">str_replace_all</span>(x,<span class="st">&quot;</span><span class="ch">\r</span><span class="st">&quot;</span>,<span class="st">&quot;&quot;</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">&quot;</span>,<span class="st">&quot;&quot;</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">str_replace_all</span>(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>,<span class="st">&quot;&quot;</span>)
 }
 
+price =<span class="st"> </span><span class="kw">html_nodes</span>(out, <span class="st">&quot;.product-wrapper&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">html_nodes</span>(<span class="st">&quot;.price-box&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">html_text</span>() <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">cleanstring</span>() <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">str_extract</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">d+&quot;</span>) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">as.numeric</span>()
+
 merk =<span class="st"> </span><span class="kw">html_nodes</span>(out, <span class="st">&quot;.product-wrapper&quot;</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">html_nodes</span>(<span class="st">&quot;h2&quot;</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">html_text</span>() <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">cleanstring</span>()</code></pre></div>
+<span class="st">  </span><span class="kw">cleanstring</span>()
+
+<span class="kw">data.frame</span>(price,merk)</code></pre></div>
+</div>
 </div>
 </div>
 <div id="predictive-modeling-technieken" class="section level1">
@@ -877,8 +889,10 @@ rulesMatch &lt;-<span class="st"> </span><span class="kw">is.subset</span>(rules
 <h1><span class="header-section-number">7</span> Deeplearning</h1>
 <p>In R kan je deeplearning modellen trainen met Keras met een Tensorflow back-end, we geven hier een simpel voorbeeld. Je kan vanuit het <code>keras</code> package tensorflow installeren. Zie ook mijn slides op <a href="https://www.slideshare.net/LonghowLam/keras-on-tensorflow-in-r-python">slideshare</a> voor verdere uitleg.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(keras)
-## dir werkt makkelijk op een linux machine en is noet ondersteunt op een windows machine!
-<span class="co">#keras::install_keras()</span></code></pre></div>
+## De library keras bevat een makkelijke functie om de tensorflow backend  installeren, 
+## dit werkt makkelijk op een linux machine en is niet echt ondersteunt op een windows machine!
+
+<span class="co"># keras::install_keras()</span></code></pre></div>
 <div id="een-simpel-model" class="section level2">
 <h2><span class="header-section-number">7.1</span> Een simpel model</h2>
 <p>We maken met keras eerst een simpel model, 1 hidden layer, niks fancy nog. Download en prepareer eerst de data.</p>
@@ -891,16 +905,15 @@ epochs &lt;-<span class="st"> </span><span class="dv">10</span>
 
 <span class="kw">dim</span>(x_train)
 
-<span class="co"># 60.000 plaatjes die 28 bij 28 zijn</span>
-x_train[<span class="dv">1</span>,,]
-
-<span class="co"># bekijk plaatje n</span>
+<span class="co"># We hebben 60.000 plaatjes die 28 bij 28 matrices zijn</span>
+x_train[<span class="dv">1</span>,,]</code></pre></div>
+<p>Zoń 28 bij 28 plaatje is ook te plotten</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># bekijk plaatje n</span>
 n =<span class="st"> </span><span class="dv">110</span>
 <span class="kw">image</span>(  x_train[n,,] )
-y_train[n]
-
-<span class="co"># We gaan nu de data wat reshapen voor het model</span>
-x_train &lt;-<span class="st"> </span><span class="kw">array_reshape</span>(x_train, <span class="kw">c</span>(<span class="kw">nrow</span>(x_train), <span class="dv">784</span>))
+y_train[n]</code></pre></div>
+<p>We gaan nu de data wat reshapen voor het model</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x_train &lt;-<span class="st"> </span><span class="kw">array_reshape</span>(x_train, <span class="kw">c</span>(<span class="kw">nrow</span>(x_train), <span class="dv">784</span>))
 x_test &lt;-<span class="st"> </span><span class="kw">array_reshape</span>(x_test, <span class="kw">c</span>(<span class="kw">nrow</span>(x_test), <span class="dv">784</span>))
 
 <span class="co"># Transform RGB values into [0,1] range</span>
@@ -947,7 +960,7 @@ score &lt;-<span class="st"> </span>model <span class="op">%&gt;%</span><span cl
 <span class="co"># Output metrics</span>
 <span class="kw">cat</span>(<span class="st">'Test loss:'</span>, score[[<span class="dv">1</span>]], <span class="st">'</span><span class="ch">\n</span><span class="st">'</span>)
 <span class="kw">cat</span>(<span class="st">'Test accuracy:'</span>, score[[<span class="dv">2</span>]], <span class="st">'</span><span class="ch">\n</span><span class="st">'</span>)</code></pre></div>
-<p>We kunnen nu nog een tweede layer toevoegem</p>
+<p>We kunnen nu nog een tweede hidden layer toevoegen.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">keras_model_sequential</span>()
 model <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">layer_dense</span>(<span class="dt">units =</span> <span class="dv">256</span>, <span class="dt">activation =</span> <span class="st">'relu'</span>, <span class="dt">input_shape =</span> <span class="kw">c</span>(<span class="dv">784</span>)) <span class="op">%&gt;%</span><span class="st"> </span>
@@ -969,15 +982,6 @@ model <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">co
 <p>Data kan je krijgen door git repo te clonen. en in data dir zitten gz files die je moet uitpakken, dit zijn binaire files die je mer R kan inlezen, gebruikmakend van de functie <code>readBin</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">### MNIST FASHION
 
-
-<span class="co"># Load the (FASHION) MNIST digit recognition dataset into R</span>
-<span class="co"># http://yann.lecun.com/exdb/mnist/</span>
-<span class="co"># assume you have all 4 files and gunzip'd them</span>
-<span class="co"># creates train$n, train$x, train$y  and test$n, test$x, test$y</span>
-<span class="co"># e.g. train$x is a 60000 x 784 matrix, each row is one digit (28x28)</span>
-<span class="co"># call:  show_digit(train$x[5,])   to see a digit.</span>
-<span class="co"># brendan o'connor - gist.github.com/39760 - anyall.org</span>
-
 load_mnist &lt;-<span class="st"> </span><span class="cf">function</span>() {
   load_image_file &lt;-<span class="st"> </span><span class="cf">function</span>(filename) {
     ret =<span class="st"> </span><span class="kw">list</span>()
@@ -991,7 +995,8 @@ load_mnist &lt;-<span class="st"> </span><span class="cf">function</span>() {
     <span class="kw">close</span>(f)
     ret
   }
-  load_label_file &lt;-<span class="st"> </span><span class="cf">function</span>(filename) {
+
+    load_label_file &lt;-<span class="st"> </span><span class="cf">function</span>(filename) {
     f =<span class="st"> </span><span class="kw">file</span>(filename,<span class="st">'rb'</span>)
     <span class="kw">readBin</span>(f,<span class="st">'integer'</span>,<span class="dt">n=</span><span class="dv">1</span>,<span class="dt">size=</span><span class="dv">4</span>,<span class="dt">endian=</span><span class="st">'big'</span>)
     n =<span class="st"> </span><span class="kw">readBin</span>(f,<span class="st">'integer'</span>,<span class="dt">n=</span><span class="dv">1</span>,<span class="dt">size=</span><span class="dv">4</span>,<span class="dt">endian=</span><span class="st">'big'</span>)
@@ -1007,6 +1012,7 @@ load_mnist &lt;-<span class="st"> </span><span class="cf">function</span>() {
   test<span class="op">$</span>y &lt;&lt;-<span class="st"> </span><span class="kw">load_label_file</span>(<span class="st">'/home/longhowlam/fashion-mnist/data/fashion/t10k-labels-idx1-ubyte'</span>)  
 }
 
+<span class="co"># functie om digit te laten zien</span>
 show_digit &lt;-<span class="st"> </span><span class="cf">function</span>(arr784, <span class="dt">col=</span><span class="kw">gray</span>(<span class="dv">12</span><span class="op">:</span><span class="dv">1</span><span class="op">/</span><span class="dv">12</span>), ...) {
   <span class="kw">image</span>(<span class="kw">matrix</span>(arr784, <span class="dt">nrow=</span><span class="dv">28</span>)[,<span class="dv">28</span><span class="op">:</span><span class="dv">1</span>], <span class="dt">col=</span>col, ...)
 }
@@ -1014,7 +1020,7 @@ show_digit &lt;-<span class="st"> </span><span class="cf">function</span>(arr784
 <span class="kw">load_mnist</span>()
 
 <span class="kw">show_digit</span>(train<span class="op">$</span>x[<span class="dv">1816</span>,])</code></pre></div>
-<p>Nu kan je het model trainen, ik heb alleen 1 epoch gezet, dit model duurt een uur op dit laptopje om te fittenn.</p>
+<p>Nu kan je het model trainen, ik heb alleen 1 epoch gezet, dit model duurt een uur op dit laptopje om te trainen. Eerst weer de data goed zetten.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(keras)
 
 batch_size &lt;-<span class="st"> </span><span class="dv">128</span>
@@ -1045,9 +1051,9 @@ x_test &lt;-<span class="st"> </span>x_test <span class="op">/</span><span class
 
 <span class="co"># convert class vectors to binary class matrices</span>
 y_train &lt;-<span class="st"> </span><span class="kw">to_categorical</span>(y_train, num_classes)
-y_test &lt;-<span class="st"> </span><span class="kw">to_categorical</span>(y_test, num_classes)
-
-<span class="co"># define a two layer conv with max pooling  model</span>
+y_test &lt;-<span class="st"> </span><span class="kw">to_categorical</span>(y_test, num_classes)</code></pre></div>
+<p>Maak in keras nu het meer complexere convolutional model.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># define a two layer conv with max pooling  model</span>
 model &lt;-<span class="st"> </span><span class="kw">keras_model_sequential</span>()
 model <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">layer_conv_2d</span>(

@@ -3,13 +3,13 @@ title: 'Some Scraping & Machine learning in R'
 author: "Longhow Lam"
 subtitle: "Trainee sessie 02"
 output:
-  pdf_document:
-    toc: true
-    toc_depth: 2
-    number_sections: true
   prettydoc::html_pretty:
     highlight: github
     theme: cayman
+    toc: true
+    toc_depth: 2
+    number_sections: true
+  pdf_document:
     toc: true
     toc_depth: 2
     number_sections: true
@@ -126,7 +126,6 @@ In een `for` loop zou je al deze links weer kunnen scrapen.
 ## Verder voorbeelden
 
 ```{r, eval = FALSE}
-
 tmp = html_form(read_html("https://hadley.wufoo.com/forms/libraryrequire-quiz/"))
 class(tmp)
 tmp[[1]]$fields$clickOrEnter$name
@@ -214,7 +213,7 @@ for(j in 1:10){
 
 Met de selector gadget plugin (in Chrome) kan je elementen selecteren op een web pagina, je krijgt dan de CSS te zien en kan deze gebruiken in de functie `html_nodes`. Een aantal voorbeelden:
 
-Hema 
+### Hema voorbeeldje 
 
 ```{r, eval=FALSE}
 ### HEMA producten
@@ -224,11 +223,10 @@ speelgoed = html_nodes(out, "h4") %>% html_text()
 prijs = html_nodes(out, ".price") %>% html_text()
 ```
 
-Mediamarkt
+### Mediamarkt voorbeeldje
 
 ```{r, eval=FALSE}
 ### Media Markt laptops, scrape 1 pagina....
-
 MM = "http://www.mediamarkt.nl/nl/category/_laptops-482723.html?searchParams=&sort=&view=PRODUCTLIST&page=3"
 
 out = read_html(MM)
@@ -246,19 +244,32 @@ merk = html_nodes(out, ".product-wrapper") %>%
   str_replace_all("\r","") %>%
   str_replace_all("\t","") %>%
   str_replace_all("\n","")
+```
 
+De `str_replace_all` functie die steeds wordt gebruikt kan je ook weg stoppen in een functie. Ook de prijs kun je nog wat netter maken door naar nuneriek te transformeren.
 
+ 
+```{r, eval=FALSE}
+## functie om wat tabs, newlines en returns weg te halen
 cleanstring <- function(x){
   str_replace_all(x,"\r","") %>%
   str_replace_all("\t","") %>%
   str_replace_all("\n","")
 }
 
+price = html_nodes(out, ".product-wrapper") %>%
+  html_nodes(".price-box") %>%
+  html_text() %>%
+  cleanstring() %>%
+  str_extract("\\d+") %>%
+    as.numeric()
+
 merk = html_nodes(out, ".product-wrapper") %>%
   html_nodes("h2") %>%
   html_text() %>%
   cleanstring()
 
+data.frame(price,merk)
 ```
 
 
@@ -1050,9 +1061,10 @@ In R kan je deeplearning modellen trainen met Keras met een Tensorflow back-end,
 
 ```{r, eval = FALSE}
 library(keras)
-## dir werkt makkelijk op een linux machine en is noet ondersteunt op een windows machine!
-#keras::install_keras()
+## De library keras bevat een makkelijke functie om de tensorflow backend  installeren, 
+## dit werkt makkelijk op een linux machine en is niet echt ondersteunt op een windows machine!
 
+# keras::install_keras()
 ```
 
 ## Een simpel model
@@ -1069,15 +1081,22 @@ c(c(x_train, y_train), c(x_test, y_test)) %<-% dataset_mnist()
 
 dim(x_train)
 
-# 60.000 plaatjes die 28 bij 28 zijn
+# We hebben 60.000 plaatjes die 28 bij 28 matrices zijn
 x_train[1,,]
+```
 
+Zoń 28 bij 28 plaatje is ook te plotten
+
+```{r, eval = FALSE}
 # bekijk plaatje n
 n = 110
 image(  x_train[n,,] )
 y_train[n]
+```
 
-# We gaan nu de data wat reshapen voor het model
+We gaan nu de data wat reshapen voor het model
+
+```{r, eval = FALSE}
 x_train <- array_reshape(x_train, c(nrow(x_train), 784))
 x_test <- array_reshape(x_test, c(nrow(x_test), 784))
 
@@ -1091,7 +1110,6 @@ cat(nrow(x_test), 'test samples\n')
 # Convert class vectors to binary class matrices
 y_train <- to_categorical(y_train, num_classes)
 y_test <- to_categorical(y_test, num_classes)
-
 ```
 
 
@@ -1139,8 +1157,7 @@ cat('Test accuracy:', score[[2]], '\n')
 ```
 
 
-
-We kunnen nu nog een tweede layer toevoegem
+We kunnen nu nog een tweede hidden layer toevoegen.
 
 ```{r, eval=FALSE}
 model <- keras_model_sequential()
@@ -1171,15 +1188,6 @@ Data kan je krijgen door git repo te clonen. en in data dir zitten gz files die 
 ```{r, eval=FALSE}
 ### MNIST FASHION
 
-
-# Load the (FASHION) MNIST digit recognition dataset into R
-# http://yann.lecun.com/exdb/mnist/
-# assume you have all 4 files and gunzip'd them
-# creates train$n, train$x, train$y  and test$n, test$x, test$y
-# e.g. train$x is a 60000 x 784 matrix, each row is one digit (28x28)
-# call:  show_digit(train$x[5,])   to see a digit.
-# brendan o'connor - gist.github.com/39760 - anyall.org
-
 load_mnist <- function() {
   load_image_file <- function(filename) {
     ret = list()
@@ -1193,7 +1201,8 @@ load_mnist <- function() {
     close(f)
     ret
   }
-  load_label_file <- function(filename) {
+
+    load_label_file <- function(filename) {
     f = file(filename,'rb')
     readBin(f,'integer',n=1,size=4,endian='big')
     n = readBin(f,'integer',n=1,size=4,endian='big')
@@ -1209,6 +1218,7 @@ load_mnist <- function() {
   test$y <<- load_label_file('/home/longhowlam/fashion-mnist/data/fashion/t10k-labels-idx1-ubyte')  
 }
 
+# functie om digit te laten zien
 show_digit <- function(arr784, col=gray(12:1/12), ...) {
   image(matrix(arr784, nrow=28)[,28:1], col=col, ...)
 }
@@ -1218,7 +1228,7 @@ load_mnist()
 show_digit(train$x[1816,])
 ```
 
-Nu kan je het model trainen, ik heb alleen 1 epoch gezet, dit model duurt een uur op dit laptopje om te fittenn.
+Nu kan je het model trainen, ik heb alleen 1 epoch gezet, dit model duurt een uur op dit laptopje om te trainen. Eerst weer de data goed zetten.
 
 
 ```{r, eval=FALSE}
@@ -1254,7 +1264,11 @@ cat(nrow(x_test), 'test samples\n')
 # convert class vectors to binary class matrices
 y_train <- to_categorical(y_train, num_classes)
 y_test <- to_categorical(y_test, num_classes)
+```
 
+Maak in keras nu het meer complexere convolutional model.
+
+```{r, eval = FALSE}
 # define a two layer conv with max pooling  model
 model <- keras_model_sequential()
 model %>%
