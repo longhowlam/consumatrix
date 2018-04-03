@@ -28,11 +28,16 @@ output:
 
 
 ```{r, eval=FALSE, include=FALSE}
+# voor scraping
 library(rvest)
 library(purrr)
 library(stringr)
 library(ggplot2)
+library(dplyr)
+```
 
+```{r, eval=FALSE, include=FALSE}
+#voor machine learning
 library(rpart)
 library(glmnet)
 library(ranger)
@@ -190,8 +195,8 @@ for(j in 1:10){
 
   ### loop nu langs alle artiekelen links 
   
-  for(i in 1:length(artikels))
-  {
+ for(i in 1:length(artikels))
+ {
     print(i)
     out2 = read_html(artikels[i])
     art = html_nodes(out2, xpath = '//div[@class="article_textwrap"]') %>% html_text %>% paste(collapse = " ")
